@@ -1,7 +1,7 @@
 export const App = () => {
   return (
     <>
-      <h1 className="text-emerald-700 text-4xl">commit from adi</h1>
+      <h1 className="text-emerald-700 mx-auto  text-4xl">commit from adi</h1>
       <p>
         Lorem ipsum dolor sit amet consectetur adipisicing elit. Quas ipsa
         facilis ipsam excepturi, dolore magnam sit suscipit alias incidunt animi
