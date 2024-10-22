@@ -63,3 +63,27 @@ exports.addTeamMember = async (req, res) => {
     res.status(500).send('Server Error');
   }
 };
+
+exports.setTeamGoal = async (req, res) => {
+  try {
+    const { teamId } = req.params;
+    const { title, description, dueDate } = req.body;
+
+    const team = await Team.findById(teamId);
+    if (!team) {
+      return res.status(404).json({ msg: 'Team not found' });
+    }
+
+    if (team.owner.toString() !== req.user.id) {
+      return res.status(403).json({ msg: 'Only team owner can set team goals' });
+    }
+
+    team.goal = { title, description, dueDate };
+    await team.save();
+
+    res.json(team);
+  } catch (err) {
+    console.error(err.message);
+    res.status(500).send('Server Error');
+  }
+};
