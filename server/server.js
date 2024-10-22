@@ -3,11 +3,15 @@ const mongoose = require('mongoose');
 const cors = require('cors');
 require('dotenv').config();
 
+const requestLogger = require('./middleware/requestLogger');
+const errorHandler = require('./middleware/errorHandler');
+
 const app = express();
 
 // Middleware
 app.use(cors());
 app.use(express.json());
+app.use(requestLogger);
 
 // Connect to MongoDB
 mongoose.connect(process.env.MONGODB_URI)
@@ -20,10 +24,7 @@ app.use('/api/teams', require('./routes/teams'));
 app.use('/api/tasks', require('./routes/tasks'));
 
 // Error handling middleware
-app.use((err, req, res, next) => {
-  console.error(err.stack);
-  res.status(500).send('Something broke!');
-});
+app.use(errorHandler);
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));

@@ -22,6 +22,14 @@ const TaskSchema = new mongoose.Schema({
   dueDate: {
     type: Date,
     required: true
+  },
+  team: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Team'
+  },
+  assignedTo: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User'
   }
 });
 
