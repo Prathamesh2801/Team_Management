@@ -1,8 +1,10 @@
 import React, { useState } from "react";
 import { Eye, EyeOff, Moon, Sun } from "lucide-react";
 import axios from "axios";
+import toast, { Toaster } from "react-hot-toast";
 
 const API_URL = "http://localhost:5000/api/auth"; // Adjust this if your server runs on a different port
+const notify = () => toast("Authentication successful");
 
 const AuthPage = () => {
   const [isLogin, setIsLogin] = useState(true);
@@ -24,10 +26,10 @@ const AuthPage = () => {
       const endpoint = isLogin ? `${API_URL}/login` : `${API_URL}/register`;
       const response = await axios.post(endpoint, formData);
       const { token } = response.data;
-      
+
       // Store the token in localStorage
       localStorage.setItem("token", token);
-      
+
       // TODO: Redirect to dashboard or home page
       console.log("Authentication successful");
     } catch (err) {
@@ -203,16 +205,16 @@ const AuthPage = () => {
             </div>
           </div>
 
-          {error && (
-            <p className="text-red-500 text-sm mt-2">{error}</p>
-          )}
+          {error && <p className="mt-2 text-sm text-red-500">{error}</p>}
 
           <button
             type="submit"
+            onClick={notify}
             className="w-full transform rounded-lg bg-gradient-to-r from-blue-600 to-indigo-600 px-4 py-3 font-medium text-white transition duration-150 hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
           >
             {isLogin ? "Log In" : "Sign Up"}
           </button>
+          <Toaster />
         </form>
 
         {isLogin && (
