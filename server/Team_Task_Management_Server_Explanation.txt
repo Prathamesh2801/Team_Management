@@ -1,0 +1,168 @@
+Team Task Management Server Explanation
+
+1. Server Structure:
+
+The server is built using Node.js with Express.js framework and MongoDB as the database. The main components are:
+
+- server.js: The entry point of the application
+- routes/: Contains route definitions
+- controllers/: Handles the business logic
+- models/: Defines database schemas
+- middleware/: Custom middleware functions
+
+2. Main Components:
+
+a) server.js:
+   - Initializes Express app
+   - Sets up middleware (cors, json parsing, request logging)
+   - Connects to MongoDB
+   - Defines main routes
+   - Sets up error handling
+   - Starts the server
+
+b) Routes:
+   - auth.js: Handles user authentication (login/register)
+   - teams.js: Manages team-related operations
+   - tasks.js: Handles task-related operations
+
+c) Controllers:
+   - teamController.js: Manages team creation, retrieval, member addition, and goal setting
+   - taskController.js: Handles task creation, retrieval, team-specific tasks, and subtasks
+
+d) Models:
+   - User.js: Represents user information and team associations
+   - Team.js: Defines team structure with owner, members, and team goal
+   - Task.js: Represents task details, including team and user associations, subtasks, and advanced features
+
+e) Middleware:
+   - auth.js: Verifies JWT tokens for protected routes
+   - requestLogger.js: Logs incoming requests
+   - errorHandler.js: Handles errors during request processing
+
+3. Enhanced Functionality:
+
+a) Team Management:
+   - Create teams with owners and members
+   - Set team goals
+   - Add members to teams
+
+b) Task Management:
+   - Create tasks with priorities, due dates, and assignments
+   - Create subtasks
+   - Associate tasks with teams
+   - Add comments to tasks
+   - Track time spent on tasks
+   - Add file attachments to tasks
+   - Tag tasks for easy categorization
+
+c) User Roles:
+   - Team members can have different roles (owner, manager, member)
+
+4. Flow Chart:
+
+[Client Request]
+       |
+       v
+[server.js (Express App)]
+       |
+       v
+[requestLogger Middleware]
+       |
+       v
+[Route Handling]
+       |
+   ____|____
+   |       |
+   v       v
+[Auth]   [Protected Routes]
+   |       |
+   |       v
+   |    [auth Middleware]
+   |       |
+   v       v
+[Controller Functions]
+       |
+       v
+[Database Operations]
+       |
+       v
+[Response to Client]
+       |
+       v
+[errorHandler Middleware (if needed)]
+
+5. Scenario: User Registration, Team Creation, and Task Assignment (using Postman)
+
+Step 1: User Registration
+POST http://localhost:5000/api/auth/register
+Body:
+{
+  "name": "John Doe",
+  "email": "john@example.com",
+  "password": "password123"
+}
+
+Step 2: User Login
+POST http://localhost:5000/api/auth/login
+Body:
+{
+  "email": "john@example.com",
+  "password": "password123"
+}
+Response: JWT Token
+
+Step 3: Create a Team
+POST http://localhost:5000/api/teams
+Headers: x-auth-token: <JWT_TOKEN>
+Body:
+{
+  "name": "Project Alpha Team"
+}
+
+Step 4: Set Team Goal
+POST http://localhost:5000/api/teams/<TEAM_ID>/goal
+Headers: x-auth-token: <JWT_TOKEN>
+Body:
+{
+  "title": "Complete Project Alpha",
+  "description": "Finish all major features of Project Alpha by the end of Q2",
+  "dueDate": "2023-06-30T23:59:59.999Z"
+}
+
+Step 5: Add Team Member
+POST http://localhost:5000/api/teams/<TEAM_ID>/members
+Headers: x-auth-token: <JWT_TOKEN>
+Body:
+{
+  "email": "jane@example.com"
+}
+
+Step 6: Create a Task
+POST http://localhost:5000/api/tasks
+Headers: x-auth-token: <JWT_TOKEN>
+Body:
+{
+  "title": "Implement User Authentication",
+  "description": "Set up user registration and login functionality",
+  "status": "todo",
+  "dueDate": "2023-05-15T23:59:59.999Z",
+  "teamId": "<TEAM_ID>",
+  "assignedTo": "<USER_ID>",
+  "priority": "high"
+}
+
+Step 7: Create a Subtask
+POST http://localhost:5000/api/tasks/subtask
+Headers: x-auth-token: <JWT_TOKEN>
+Body:
+{
+  "title": "Set up JWT",
+  "description": "Implement JWT for secure authentication",
+  "status": "todo",
+  "dueDate": "2023-05-10T23:59:59.999Z",
+  "teamId": "<TEAM_ID>",
+  "assignedTo": "<USER_ID>",
+  "parentTaskId": "<PARENT_TASK_ID>"
+}
+
+This scenario demonstrates the full flow of user registration, team creation with a collective goal, and task assignment to individual members. The enhanced Task model allows for prioritization, comments, time tracking, and file attachments, providing a comprehensive task management solution.

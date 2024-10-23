@@ -1,10 +1,13 @@
 import React, { useState } from "react";
 import { Eye, EyeOff, Moon, Sun } from "lucide-react";
+import axios from "axios";
+
+const API_URL = "http://localhost:5000/api/auth"; // Adjust this if your server runs on a different port
 
 const AuthPage = () => {
   const [isLogin, setIsLogin] = useState(true);
   const [formData, setFormData] = useState({
-    username: "",
+    name: "",
     email: "",
     password: "",
   });
@@ -12,12 +15,24 @@ const AuthPage = () => {
   const [isDark, setIsDark] = useState(
     window.matchMedia("(prefers-color-scheme: dark)").matches
   );
+  const [error, setError] = useState("");
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    // backend
-    console.log("Form submitted:", formData);
-    // api call
+    setError("");
+    try {
+      const endpoint = isLogin ? `${API_URL}/login` : `${API_URL}/register`;
+      const response = await axios.post(endpoint, formData);
+      const { token } = response.data;
+      
+      // Store the token in localStorage
+      localStorage.setItem("token", token);
+      
+      // TODO: Redirect to dashboard or home page
+      console.log("Authentication successful");
+    } catch (err) {
+      setError(err.response?.data?.msg || "An error occurred");
+    }
   };
 
   const handleChange = (e) => {
@@ -30,10 +45,11 @@ const AuthPage = () => {
   const toggleAuthMode = () => {
     setIsLogin(!isLogin);
     setFormData({
-      username: "",
+      name: "",
       email: "",
       password: "",
     });
+    setError("");
   };
 
   const toggleTheme = () => {
@@ -95,45 +111,20 @@ const AuthPage = () => {
         {/* Form */}
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="space-y-4">
-            <div>
-              <label
-                htmlFor="username"
-                className={`block text-sm font-medium transition-colors
-                ${isDark ? "text-gray-300" : "text-gray-700"}`}
-              >
-                Username
-              </label>
-              <input
-                type="text"
-                id="username"
-                name="username"
-                value={formData.username}
-                onChange={handleChange}
-                required
-                className={`mt-1 block w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors
-                  ${
-                    isDark
-                      ? "bg-gray-700 border-gray-600 text-white placeholder-gray-400"
-                      : "bg-gray-50 border-gray-300 text-gray-900 placeholder-gray-500"
-                  }`}
-                placeholder="Enter your username"
-              />
-            </div>
-
             {!isLogin && (
               <div>
                 <label
-                  htmlFor="email"
+                  htmlFor="name"
                   className={`block text-sm font-medium transition-colors
                   ${isDark ? "text-gray-300" : "text-gray-700"}`}
                 >
-                  Email
+                  Name
                 </label>
                 <input
-                  type="email"
-                  id="email"
-                  name="email"
-                  value={formData.email}
+                  type="text"
+                  id="name"
+                  name="name"
+                  value={formData.name}
                   onChange={handleChange}
                   required
                   className={`mt-1 block w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors
@@ -142,10 +133,35 @@ const AuthPage = () => {
                         ? "bg-gray-700 border-gray-600 text-white placeholder-gray-400"
                         : "bg-gray-50 border-gray-300 text-gray-900 placeholder-gray-500"
                     }`}
-                  placeholder="Enter your email"
+                  placeholder="Enter your name"
                 />
               </div>
             )}
+
+            <div>
+              <label
+                htmlFor="email"
+                className={`block text-sm font-medium transition-colors
+                ${isDark ? "text-gray-300" : "text-gray-700"}`}
+              >
+                Email
+              </label>
+              <input
+                type="email"
+                id="email"
+                name="email"
+                value={formData.email}
+                onChange={handleChange}
+                required
+                className={`mt-1 block w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors
+                  ${
+                    isDark
+                      ? "bg-gray-700 border-gray-600 text-white placeholder-gray-400"
+                      : "bg-gray-50 border-gray-300 text-gray-900 placeholder-gray-500"
+                  }`}
+                placeholder="Enter your email"
+              />
+            </div>
 
             <div>
               <label
@@ -186,6 +202,10 @@ const AuthPage = () => {
               </div>
             </div>
           </div>
+
+          {error && (
+            <p className="text-red-500 text-sm mt-2">{error}</p>
+          )}
 
           <button
             type="submit"
