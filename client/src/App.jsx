@@ -1,9 +1,3 @@
-import AuthPage from "./components/AuthPage";
-
 export const App = () => {
-  return (
-    <>
-      <AuthPage />
-    </>
-  );
+  return <>{/* empty component */}</>;
 };
