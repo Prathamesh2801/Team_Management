@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Eye, EyeOff, Moon, Sun } from "lucide-react";
+import { Eye, EyeOff } from "lucide-react";
 import axios from "axios";
 import toast, { Toaster } from "react-hot-toast";
 import { NavLink } from "react-router-dom";
@@ -15,9 +15,6 @@ export const AuthPage = () => {
     password: "",
   });
   const [showPassword, setShowPassword] = useState(false);
-  const [isDark, setIsDark] = useState(
-    window.matchMedia("(prefers-color-scheme: dark)").matches
-  );
   const [error, setError] = useState("");
 
   const handleSubmit = async (e) => {
@@ -27,9 +24,7 @@ export const AuthPage = () => {
       const endpoint = isLogin ? `${API_URL}/login` : `${API_URL}/register`;
       const response = await axios.post(endpoint, formData);
       const { token } = response.data;
-
       localStorage.setItem("token", token);
-
       console.log("Authentication successful");
     } catch (err) {
       setError(err.response?.data?.msg || "An error occurred");
@@ -53,58 +48,20 @@ export const AuthPage = () => {
     setError("");
   };
 
-  const toggleTheme = () => {
-    setIsDark(!isDark);
-  };
-
   return (
     <>
       <NavLink to="/">
-        <p className="absolute left-4 top-4 font-medium text-white">
+        <p className="absolute left-4 top-4 font-medium text-gray-700 dark:text-gray-200">
           « Back to Home
         </p>
       </NavLink>
-      <div
-        className={`min-h-screen flex items-center justify-center transition-colors duration-300
-      ${
-        isDark
-          ? "bg-gradient-to-br from-gray-900 to-gray-800"
-          : "bg-gradient-to-br from-gray-50 to-gray-100"
-      }`}
-      >
-        <div
-          className={`w-full max-w-md p-8 space-y-6 rounded-xl shadow-lg transition-colors duration-300
-        ${
-          isDark
-            ? "bg-gray-800 shadow-gray-900/50"
-            : "bg-white shadow-gray-200/50"
-        }`}
-        >
-          {/* Theme Toggle */}
-          <div className="flex justify-end">
-            <button
-              onClick={toggleTheme}
-              className={`p-2 rounded-lg transition-colors
-              ${
-                isDark
-                  ? "text-gray-400 hover:text-gray-200"
-                  : "text-gray-600 hover:text-gray-800"
-              }`}
-            >
-              {isDark ? <Sun size={20} /> : <Moon size={20} />}
-            </button>
-          </div>
-
-          {/* Header */}
+      <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-900 dark:to-slate-800">
+        <div className="w-[90%] max-w-md space-y-6 rounded-xl bg-white p-8 shadow-lg dark:bg-slate-800 md:w-full">
           <div className="text-center">
-            <h2 className="bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-3xl font-bold text-transparent">
+            <h2 className="bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-3xl font-bold text-transparent dark:from-blue-400 dark:to-indigo-400">
               {isLogin ? "Welcome Back" : "Create Account"}
             </h2>
-            <p
-              className={`mt-2 transition-colors ${
-                isDark ? "text-gray-400" : "text-gray-600"
-              }`}
-            >
+            <p className="mt-2 text-gray-600 dark:text-gray-300">
               {isLogin
                 ? "Don't have an account? "
                 : "Already have an account? "}
@@ -116,16 +73,13 @@ export const AuthPage = () => {
               </button>
             </p>
           </div>
-
-          {/* Form */}
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="space-y-4">
               {!isLogin && (
                 <div>
                   <label
                     htmlFor="name"
-                    className={`block text-sm font-medium transition-colors
-                  ${isDark ? "text-gray-300" : "text-gray-700"}`}
+                    className="block text-sm font-medium text-gray-700 dark:text-gray-200"
                   >
                     Name
                   </label>
@@ -136,12 +90,7 @@ export const AuthPage = () => {
                     value={formData.name}
                     onChange={handleChange}
                     required
-                    className={`mt-1 block w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors
-                    ${
-                      isDark
-                        ? "bg-gray-700 border-gray-600 text-white placeholder-gray-400"
-                        : "bg-gray-50 border-gray-300 text-gray-900 placeholder-gray-500"
-                    }`}
+                    className="mt-1 block w-full rounded-lg border border-gray-300 px-3 py-2 focus:border-blue-500 focus:ring-2 focus:ring-blue-500 dark:border-gray-600 dark:bg-slate-700 dark:text-white dark:placeholder-gray-400"
                     placeholder="Enter your name"
                   />
                 </div>
@@ -150,8 +99,7 @@ export const AuthPage = () => {
               <div>
                 <label
                   htmlFor="email"
-                  className={`block text-sm font-medium transition-colors
-                ${isDark ? "text-gray-300" : "text-gray-700"}`}
+                  className="block text-sm font-medium text-gray-700 dark:text-gray-200"
                 >
                   Email
                 </label>
@@ -162,12 +110,7 @@ export const AuthPage = () => {
                   value={formData.email}
                   onChange={handleChange}
                   required
-                  className={`mt-1 block w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors
-                  ${
-                    isDark
-                      ? "bg-gray-700 border-gray-600 text-white placeholder-gray-400"
-                      : "bg-gray-50 border-gray-300 text-gray-900 placeholder-gray-500"
-                  }`}
+                  className="mt-1 block w-full rounded-lg border border-gray-300 px-3 py-2 focus:border-blue-500 focus:ring-2 focus:ring-blue-500 dark:border-gray-600 dark:bg-slate-700 dark:text-white dark:placeholder-gray-400"
                   placeholder="Enter your email"
                 />
               </div>
@@ -175,8 +118,7 @@ export const AuthPage = () => {
               <div>
                 <label
                   htmlFor="password"
-                  className={`block text-sm font-medium transition-colors
-                ${isDark ? "text-gray-300" : "text-gray-700"}`}
+                  className="block text-sm font-medium text-gray-700 dark:text-gray-200"
                 >
                   Password
                 </label>
@@ -188,23 +130,13 @@ export const AuthPage = () => {
                     value={formData.password}
                     onChange={handleChange}
                     required
-                    className={`mt-1 block w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors
-                    ${
-                      isDark
-                        ? "bg-gray-700 border-gray-600 text-white placeholder-gray-400"
-                        : "bg-gray-50 border-gray-300 text-gray-900 placeholder-gray-500"
-                    }`}
+                    className="mt-1 block w-full rounded-lg border border-gray-300 px-3 py-2 focus:border-blue-500 focus:ring-2 focus:ring-blue-500 dark:border-gray-600 dark:bg-slate-700 dark:text-white dark:placeholder-gray-400"
                     placeholder="Enter your password"
                   />
                   <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
-                    className={`absolute right-3 top-1/2 -translate-y-1/2 transition-colors
-                    ${
-                      isDark
-                        ? "text-gray-400 hover:text-gray-300"
-                        : "text-gray-500 hover:text-gray-700"
-                    }`}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 dark:text-gray-400"
                   >
                     {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
                   </button>
@@ -217,7 +149,7 @@ export const AuthPage = () => {
             <button
               type="submit"
               onClick={notify}
-              className="to-emerlad-600 w-full transform rounded-lg bg-gradient-to-r from-blue-600 px-4 py-3 font-medium text-white transition duration-150 hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+              className="w-full transform rounded-lg bg-gradient-to-r from-blue-600 to-indigo-600 px-4 py-3 font-medium text-white transition duration-150 hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:from-blue-500 dark:to-indigo-500"
             >
               {isLogin ? "Log In" : "Sign Up"}
             </button>
