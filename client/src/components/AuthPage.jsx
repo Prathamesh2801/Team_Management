@@ -1,11 +1,10 @@
 import React, { useState } from "react";
-import { Eye, EyeOff } from "lucide-react";
+import { Eye, EyeOff, CheckCircle, XCircle } from "lucide-react";
 import axios from "axios";
 import toast, { Toaster } from "react-hot-toast";
 import { NavLink } from "react-router-dom";
 
 const API_URL = "http://localhost:5000/api/auth";
-const notify = () => toast("Authentication successful");
 
 export const AuthPage = () => {
   const [isLogin, setIsLogin] = useState(true);
@@ -15,19 +14,17 @@ export const AuthPage = () => {
     password: "",
   });
   const [showPassword, setShowPassword] = useState(false);
-  const [error, setError] = useState("");
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setError("");
     try {
       const endpoint = isLogin ? `${API_URL}/login` : `${API_URL}/register`;
       const response = await axios.post(endpoint, formData);
       const { token } = response.data;
       localStorage.setItem("token", token);
-      console.log("Authentication successful");
+      toast.success("Authentication successful");
     } catch (err) {
-      setError(err.response?.data?.msg || "An error occurred");
+      toast.error(err.message);
     }
   };
 
@@ -45,7 +42,6 @@ export const AuthPage = () => {
       email: "",
       password: "",
     });
-    setError("");
   };
 
   return (
@@ -55,10 +51,10 @@ export const AuthPage = () => {
           « Back to Home
         </p>
       </NavLink>
-      <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-900 dark:to-slate-800">
-        <div className="w-[90%] max-w-md space-y-6 rounded-xl bg-white p-8 shadow-lg dark:bg-slate-800 md:w-full">
+      <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-slate-50 to-slate-100 dark:from-neutral-950 dark:to-neutral-900">
+        <div className="w-[90%] max-w-md space-y-6 rounded-xl bg-white p-8 shadow-lg dark:bg-neutral-900 md:w-full">
           <div className="text-center">
-            <h2 className="bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-3xl font-bold text-transparent dark:from-blue-400 dark:to-indigo-400">
+            <h2 className="bg-gradient-to-r from-stone-600 to-indigo-600 bg-clip-text text-3xl font-bold text-transparent dark:from-stone-400 dark:to-stone-600">
               {isLogin ? "Welcome Back" : "Create Account"}
             </h2>
             <p className="mt-2 text-gray-600 dark:text-gray-300">
@@ -90,7 +86,7 @@ export const AuthPage = () => {
                     value={formData.name}
                     onChange={handleChange}
                     required
-                    className="mt-1 block w-full rounded-lg border border-gray-300 px-3 py-2 focus:border-blue-500 focus:ring-2 focus:ring-blue-500 dark:border-gray-600 dark:bg-slate-700 dark:text-white dark:placeholder-gray-400"
+                    className="mt-1 block w-full rounded-lg border-2 border-gray-300 px-3 py-2 outline-none transition-all duration-150 focus:shadow-lg dark:border-neutral-800 dark:bg-neutral-900 dark:text-white dark:placeholder-gray-400"
                     placeholder="Enter your name"
                   />
                 </div>
@@ -110,7 +106,7 @@ export const AuthPage = () => {
                   value={formData.email}
                   onChange={handleChange}
                   required
-                  className="mt-1 block w-full rounded-lg border border-gray-300 px-3 py-2 focus:border-blue-500 focus:ring-2 focus:ring-blue-500 dark:border-gray-600 dark:bg-slate-700 dark:text-white dark:placeholder-gray-400"
+                  className="mt-1 block w-full rounded-lg border-2 border-gray-300 px-3 py-2 outline-none transition-all duration-150 focus:shadow-lg dark:border-neutral-800 dark:bg-neutral-900 dark:text-white dark:placeholder-gray-400"
                   placeholder="Enter your email"
                 />
               </div>
@@ -130,7 +126,7 @@ export const AuthPage = () => {
                     value={formData.password}
                     onChange={handleChange}
                     required
-                    className="mt-1 block w-full rounded-lg border border-gray-300 px-3 py-2 focus:border-blue-500 focus:ring-2 focus:ring-blue-500 dark:border-gray-600 dark:bg-slate-700 dark:text-white dark:placeholder-gray-400"
+                    className="mt-1 block w-full rounded-lg border-2 border-gray-300 px-3 py-2 outline-none transition-all duration-150 focus:shadow-lg dark:border-neutral-800 dark:bg-neutral-900 dark:text-white dark:placeholder-gray-400"
                     placeholder="Enter your password"
                   />
                   <button
@@ -144,16 +140,24 @@ export const AuthPage = () => {
               </div>
             </div>
 
-            {error && <p className="mt-2 text-sm text-red-500">{error}</p>}
-
             <button
               type="submit"
-              onClick={notify}
-              className="w-full transform rounded-lg bg-gradient-to-r from-blue-600 to-indigo-600 px-4 py-3 font-medium text-white transition duration-150 hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:from-blue-500 dark:to-indigo-500"
+              className="w-full transform rounded-lg border-2 border-indigo-600 bg-white px-4 py-3 font-medium text-gray-700 transition duration-150 hover:bg-neutral-300 hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:bg-neutral-900 dark:text-white dark:hover:bg-neutral-800"
             >
               {isLogin ? "Log In" : "Sign Up"}
             </button>
-            <Toaster />
+            <Toaster
+              toastOptions={{
+                className:
+                  "bg-neutral-100 text-neutral-900 dark:bg-neutral-800 dark:text-neutral-200",
+                success: {
+                  icon: <CheckCircle className="h-6 w-6 text-green-500" />,
+                },
+                error: {
+                  icon: <XCircle className="h-6 w-6 text-red-500" />,
+                },
+              }}
+            />
           </form>
 
           {isLogin && (
