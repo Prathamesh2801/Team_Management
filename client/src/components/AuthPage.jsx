@@ -3,8 +3,10 @@ import { Eye, EyeOff, CheckCircle, XCircle } from "lucide-react";
 import axios from "axios";
 import toast, { Toaster } from "react-hot-toast";
 import { NavLink } from "react-router-dom";
+// import { useNavigate } from "react-router-dom";
 
 const API_URL = "http://localhost:5000/api/auth";
+// const navigate = useNavigate();
 
 export const AuthPage = () => {
   const [isLogin, setIsLogin] = useState(true);
@@ -22,6 +24,9 @@ export const AuthPage = () => {
       const response = await axios.post(endpoint, formData);
       const { token } = response.data;
       localStorage.setItem("token", token);
+      // if (localStorage.getItem("token")) {
+      //   navigate("/dashboard");
+      // }
       toast.success("Authentication successful");
     } catch (err) {
       toast.error(err.message);
