@@ -25,8 +25,10 @@ export const AuthPage = () => {
       const response = await axios.post(endpoint, formData);
       const { token } = response.data;
       localStorage.setItem("token", token);
+      toast.success("Authentication successful");
       console.log("Authentication successful");
     } catch (err) {
+      toast.error(err.message);
       setError(err.response?.data?.msg || "An error occurred");
     }
   };
@@ -148,7 +150,6 @@ export const AuthPage = () => {
 
             <button
               type="submit"
-              onClick={notify}
               className="w-full transform rounded-lg bg-gradient-to-r from-blue-600 to-indigo-600 px-4 py-3 font-medium text-white transition duration-150 hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:from-blue-500 dark:to-indigo-500"
             >
               {isLogin ? "Log In" : "Sign Up"}
