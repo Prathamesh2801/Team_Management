@@ -4,12 +4,11 @@ import axios from "axios";
 import toast, { Toaster } from "react-hot-toast";
 import { NavLink, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
-
-const API_URL = "http://localhost:5000/api/auth";
+import api from "../utils/api";
 
 export const AuthPage = () => {
   const navigate = useNavigate();
-  const { setUser } = useAuth();
+  const { setUser, login } = useAuth();
   const [isLogin, setIsLogin] = useState(true);
   const [formData, setFormData] = useState({
     name: "",
@@ -20,28 +19,25 @@ export const AuthPage = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    
     try {
-      const endpoint = isLogin ? `${API_URL}/login` : `${API_URL}/register`;
-      const response = await axios.post(endpoint, formData);
-      const { token } = response.data;
-      localStorage.setItem("token", token);
-      
-      const userResponse = await axios.get(`${API_URL}/verify`, {
-        headers: {
-          'x-auth-token': token
+      const response = await api.post(
+        isLogin ? '/auth/login' : '/auth/register', 
+        {
+          email: formData.email,
+          password: formData.password,
+          ...((!isLogin && formData.name) && { name: formData.name })
         }
-      });
+      );
       
-      setUser(userResponse.data);
-      toast.success("Authentication successful", {
-        duration: 2000
-      });
+      const { token } = response.data;
+      await login(token);
       
-      setTimeout(() => {
-        navigate("/dashboard");
-      }, 1000);
+      toast.success(isLogin ? "Login successful!" : "Registration successful!");
+      navigate("/dashboard");
     } catch (err) {
-      toast.error(err.response?.data?.msg || "An error occurred");
+      console.error('Auth error:', err);
+      toast.error(err.response?.data?.msg || "Authentication failed");
     }
   };
 

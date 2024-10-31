@@ -1,11 +1,12 @@
 import { Sidebar } from "../components/Sidebar";
-import { Outlet } from "react-router-dom";
 
 export const Layout = ({ children }) => {
   return (
-    <div className="flex h-screen flex-col">
+    <div className="flex">
       <Sidebar />
-      <Outlet />
+      <main className="flex-1 bg-white dark:bg-neutral-950">
+        {children}
+      </main>
     </div>
   );
 };
