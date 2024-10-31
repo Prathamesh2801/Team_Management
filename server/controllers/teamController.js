@@ -4,29 +4,35 @@ const User = require('../models/User');
 exports.createTeam = async (req, res) => {
   try {
     const { name } = req.body;
+    
     const newTeam = new Team({
       name,
       owner: req.user.id,
       members: [req.user.id]
     });
+
     const team = await newTeam.save();
-    
-    await User.findByIdAndUpdate(req.user.id, { $push: { teams: team._id } });
-    
     res.json(team);
   } catch (err) {
-    console.error(err.message);
-    res.status(500).send('Server Error');
+    console.error('Error creating team:', err);
+    res.status(500).json({ msg: 'Server error while creating team' });
   }
 };
 
 exports.getUserTeams = async (req, res) => {
   try {
-    const teams = await Team.find({ members: req.user.id });
+    // Find teams where the user is either an owner or a member
+    const teams = await Team.find({
+      $or: [
+        { owner: req.user.id },
+        { members: req.user.id }
+      ]
+    });
+    
     res.json(teams);
   } catch (err) {
-    console.error(err.message);
-    res.status(500).send('Server Error');
+    console.error('Error fetching teams:', err);
+    res.status(500).json({ msg: 'Server error while fetching teams' });
   }
 };
 

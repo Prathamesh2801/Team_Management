@@ -11,9 +11,13 @@ module.exports = function(req, res, next) {
 
   try {
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    if (!decoded.user || !decoded.user.id) {
+      throw new Error('Invalid token structure');
+    }
     req.user = decoded.user;
     next();
   } catch (err) {
+    console.error('Auth middleware error:', err);
     res.status(401).json({ msg: 'Token is not valid' });
   }
 };

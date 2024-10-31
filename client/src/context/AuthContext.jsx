@@ -1,55 +1,63 @@
-import { createContext, useContext, useState, useEffect } from 'react';
-import axios from 'axios';
+import { createContext, useContext, useState, useEffect } from "react";
+import api from "../utils/api";
+import toast from "react-hot-toast";
 
-const AuthContext = createContext(null);
+const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
 
+  useEffect(() => {
+    const token = localStorage.getItem('token');
+    if (token) {
+      api.defaults.headers.common['x-auth-token'] = token;
+      fetchUser();
+    } else {
+      setLoading(false);
+    }
+  }, []);
+
+  const fetchUser = async () => {
+    try {
+      const res = await api.get('/auth/user');
+      if (res.data) {
+        setUser(res.data);
+      } else {
+        throw new Error('No user data received');
+      }
+    } catch (err) {
+      console.error('Error fetching user:', err);
+      localStorage.removeItem('token');
+      delete api.defaults.headers.common['x-auth-token'];
+      setUser(null);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const login = async (token) => {
+    try {
+      localStorage.setItem('token', token);
+      api.defaults.headers.common['x-auth-token'] = token;
+      await fetchUser();
+    } catch (error) {
+      console.error('Login error:', error);
+      throw error;
+    }
+  };
+
   const logout = () => {
     localStorage.removeItem('token');
+    delete api.defaults.headers.common['x-auth-token'];
     setUser(null);
   };
 
-  useEffect(() => {
-    const verifyUser = async () => {
-      const token = localStorage.getItem('token');
-      if (token) {
-        try {
-          const response = await axios.get('http://localhost:5000/api/auth/verify', {
-            headers: {
-              'x-auth-token': token
-            }
-          });
-          setUser(response.data);
-        } catch (err) {
-          localStorage.removeItem('token');
-        }
-      }
-      setLoading(false);
-    };
-    verifyUser();
-  }, []);
-
-  const value = {
-    user,
-    setUser,
-    loading,
-    logout
-  };
-
   return (
-    <AuthContext.Provider value={value}>
+    <AuthContext.Provider value={{ user, login, logout, loading }}>
       {children}
     </AuthContext.Provider>
   );
 };
 
-export const useAuth = () => {
-  const context = useContext(AuthContext);
-  if (!context) {
-    throw new Error('useAuth must be used within an AuthProvider');
-  }
-  return context;
-}; 
+export const useAuth = () => useContext(AuthContext);

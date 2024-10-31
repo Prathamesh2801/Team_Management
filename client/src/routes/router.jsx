@@ -1,23 +1,26 @@
-import { createBrowserRouter, createRoutesFromElements, Route } from "react-router-dom";
+import { createBrowserRouter } from "react-router-dom";
 import { LandingPage } from "../app/LandingPage";
-import { AuthPage } from "../components/AuthPage";
 import { Dashboard } from "../app/Dashboard";
-import { ErrorPage } from "../app/Errorpage";
+import { AuthPage } from "../components/AuthPage";
+import { ErrorPage } from "../app/ErrorPage";
 import { ProtectedRoute } from "../components/ProtectedRoute";
 
-export const router = createBrowserRouter(
-  createRoutesFromElements(
-    <Route>
-      <Route path="/" element={<LandingPage />} errorElement={<ErrorPage />} />
-      <Route path="/auth" element={<AuthPage />} />
-      <Route
-        path="/dashboard"
-        element={
-          <ProtectedRoute>
-            <Dashboard />
-          </ProtectedRoute>
-        }
-      />
-    </Route>
-  )
-);
+export const router = createBrowserRouter([
+  {
+    path: "/",
+    element: <LandingPage />,
+    errorElement: <ErrorPage />,
+  },
+  {
+    path: "/dashboard",
+    element: (
+      <ProtectedRoute>
+        <Dashboard />
+      </ProtectedRoute>
+    ),
+  },
+  {
+    path: "/auth",
+    element: <AuthPage />,
+  }
+]);
