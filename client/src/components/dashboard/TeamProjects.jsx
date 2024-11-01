@@ -37,7 +37,7 @@ export const TeamProjects = () => {
   }
 
   return (
-    <div className="rounded-lg bg-white p-6 shadow-sm dark:bg-neutral-900">
+    <div className="rounded-lg bg-neutral-200 p-6 dark:bg-neutral-900">
       <div className="mb-6 flex items-center justify-between">
         <h2 className="text-xl font-bold text-gray-900 dark:text-white">
           Team Projects
@@ -71,4 +71,4 @@ export const TeamProjects = () => {
       )}
     </div>
   );
-}; 
+};

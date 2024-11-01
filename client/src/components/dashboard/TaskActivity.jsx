@@ -18,7 +18,7 @@ export const TaskActivity = () => {
   }, []);
 
   return (
-    <div className="rounded-lg bg-white p-6 shadow-sm dark:bg-neutral-900">
+    <div className="rounded-lg bg-neutral-200 p-6 dark:bg-neutral-900">
       <h2 className="mb-6 text-xl font-bold text-gray-900 dark:text-white">
         Recent Activity
       </h2>
@@ -48,4 +48,4 @@ export const TaskActivity = () => {
       </div>
     </div>
   );
-}; 
+};

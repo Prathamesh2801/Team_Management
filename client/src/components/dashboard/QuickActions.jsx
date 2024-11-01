@@ -29,7 +29,7 @@ export const QuickActions = () => {
       {actions.map((action, index) => (
         <button
           key={index}
-          className="flex items-center gap-4 rounded-lg bg-white p-4 text-left shadow-sm transition-all hover:shadow-md dark:bg-neutral-900"
+          className="flex items-center gap-4 rounded-lg bg-neutral-200 p-4 text-left transition-all hover:shadow-md dark:bg-neutral-900"
         >
           <div className="rounded-full bg-indigo-100 p-2 dark:bg-indigo-900">
             {action.icon}
@@ -46,4 +46,4 @@ export const QuickActions = () => {
       ))}
     </div>
   );
-}; 
+};
