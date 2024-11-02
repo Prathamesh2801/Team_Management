@@ -3,10 +3,12 @@ import { Plus } from "lucide-react";
 import api from "../../utils/api";
 import { toast } from "react-hot-toast";
 import { useAuth } from "../../context/AuthContext";
+import { CreateTeamModal } from "../team/CreateTeamModal";
 
 export const TeamProjects = () => {
   const [teams, setTeams] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [showCreateModal, setShowCreateModal] = useState(false);
   const { user } = useAuth();
 
   useEffect(() => {
@@ -28,6 +30,18 @@ export const TeamProjects = () => {
     }
   };
 
+  const handleCreateTeam = async (teamData) => {
+    try {
+      const response = await api.post("/teams", teamData);
+      setTeams([...teams, response.data]);
+      toast.success("Team created successfully!");
+      setShowCreateModal(false);
+    } catch (error) {
+      console.error("Error creating team:", error);
+      toast.error("Failed to create team");
+    }
+  };
+
   if (loading) {
     return (
       <div className="rounded-lg bg-white p-6 shadow-sm dark:bg-neutral-900">
@@ -42,7 +56,10 @@ export const TeamProjects = () => {
         <h2 className="text-xl font-bold text-gray-900 dark:text-white">
           Team Projects
         </h2>
-        <button className="flex items-center gap-2 rounded-lg bg-indigo-600 px-4 py-2 text-sm font-medium text-white hover:bg-indigo-700">
+        <button 
+          onClick={() => setShowCreateModal(true)}
+          className="flex items-center gap-2 rounded-lg bg-indigo-600 px-4 py-2 text-sm font-medium text-white hover:bg-indigo-700"
+        >
           <Plus className="h-4 w-4" />
           New Team
         </button>
@@ -68,6 +85,13 @@ export const TeamProjects = () => {
             </div>
           ))}
         </div>
+      )}
+
+      {showCreateModal && (
+        <CreateTeamModal 
+          onClose={() => setShowCreateModal(false)}
+          onCreate={handleCreateTeam}
+        />
       )}
     </div>
   );

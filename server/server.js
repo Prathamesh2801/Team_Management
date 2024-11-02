@@ -1,7 +1,7 @@
+require('dotenv').config();
 const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
-require('dotenv').config();
 
 const requestLogger = require('./middleware/requestLogger');
 const errorHandler = require('./middleware/errorHandler');
@@ -28,3 +28,10 @@ app.use(errorHandler);
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+
+console.log('Environment Variables Loaded:', {
+  port: process.env.PORT,
+  mongoUri: process.env.MONGODB_URI,
+  clientUrl: process.env.CLIENT_URL,
+  smtpConfigured: !!process.env.SMTP_USER
+});
