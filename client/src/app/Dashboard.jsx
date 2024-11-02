@@ -7,7 +7,7 @@ export const Dashboard = () => {
   return (
     <div className="bg-white dark:bg-neutral-950">
       <Layout>
-        <div className="grid grid-cols-1 gap-6 p-6 lg:grid-cols-3">
+        <div className="grid min-h-screen grid-cols-1 gap-6 p-6 md:min-h-0 lg:grid-cols-3">
           <div className="lg:col-span-3">
             <QuickActions />
           </div>
