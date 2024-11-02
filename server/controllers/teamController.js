@@ -28,11 +28,10 @@ exports.createTeam = async (req, res) => {
 
 exports.getUserTeams = async (req, res) => {
   try {
-    // Find teams where the user is either an owner or a member
     const teams = await Team.find({
       $or: [
         { owner: req.user.id },
-        { members: req.user.id }
+        { 'members.user': req.user.id }
       ]
     });
     

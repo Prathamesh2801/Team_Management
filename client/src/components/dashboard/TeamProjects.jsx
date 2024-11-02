@@ -4,11 +4,14 @@ import api from "../../utils/api";
 import { toast } from "react-hot-toast";
 import { useAuth } from "../../context/AuthContext";
 import { CreateTeamModal } from "../team/CreateTeamModal";
+import { InviteModal } from "../team/InviteModal";
 
 export const TeamProjects = () => {
   const [teams, setTeams] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showCreateModal, setShowCreateModal] = useState(false);
+  const [showInviteModal, setShowInviteModal] = useState(false);
+  const [selectedTeamId, setSelectedTeamId] = useState(null);
   const { user } = useAuth();
 
   useEffect(() => {
@@ -40,6 +43,11 @@ export const TeamProjects = () => {
       console.error("Error creating team:", error);
       toast.error("Failed to create team");
     }
+  };
+
+  const handleInvite = (teamId) => {
+    setSelectedTeamId(teamId);
+    setShowInviteModal(true);
   };
 
   if (loading) {
@@ -82,6 +90,12 @@ export const TeamProjects = () => {
                   Goal: {team.goal.title}
                 </p>
               )}
+              <button
+                onClick={() => handleInvite(team._id)}
+                className="mt-2 text-sm text-indigo-600 hover:text-indigo-700"
+              >
+                Invite Members
+              </button>
             </div>
           ))}
         </div>
@@ -91,6 +105,13 @@ export const TeamProjects = () => {
         <CreateTeamModal 
           onClose={() => setShowCreateModal(false)}
           onCreate={handleCreateTeam}
+        />
+      )}
+
+      {showInviteModal && (
+        <InviteModal 
+          teamId={selectedTeamId}
+          onClose={() => setShowInviteModal(false)}
         />
       )}
     </div>
