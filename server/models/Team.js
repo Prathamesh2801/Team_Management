@@ -1,14 +1,22 @@
 const mongoose = require('mongoose');
 
-const TeamMemberSchema = new mongoose.Schema({
-  user: {
+const InviteLinkSchema = new mongoose.Schema({
+  code: {
+    type: String,
+    required: true,
+    unique: true
+  },
+  createdBy: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User'
   },
-  role: {
-    type: String,
-    enum: ['owner', 'manager', 'member'],
-    default: 'member'
+  expiresAt: {
+    type: Date,
+    required: true
+  },
+  isUsed: {
+    type: Boolean,
+    default: false
   }
 });
 
@@ -17,16 +25,47 @@ const TeamSchema = new mongoose.Schema({
     type: String,
     required: true
   },
+  description: {
+    type: String
+  },
   owner: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User',
     required: true
   },
-  members: [TeamMemberSchema],
+  members: [{
+    user: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'User'
+    },
+    role: {
+      type: String,
+      enum: ['owner', 'admin', 'member'],
+      default: 'member'
+    },
+    status: {
+      type: String,
+      enum: ['pending', 'active'],
+      default: 'pending'
+    },
+    inviteToken: String,
+    inviteExpires: Date
+  }],
   goal: {
     title: String,
     description: String,
-    dueDate: Date
+    dueDate: Date,
+    status: {
+      type: String,
+      enum: ['not_started', 'in_progress', 'completed'],
+      default: 'not_started'
+    }
+  },
+  inviteLinks: [InviteLinkSchema],
+  githubRepo: {
+    owner: String,
+    repo: String,
+    installationId: Number
   },
   createdAt: {
     type: Date,
