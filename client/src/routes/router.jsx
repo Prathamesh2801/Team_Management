@@ -4,6 +4,7 @@ import { Dashboard } from "../app/Dashboard";
 import { AuthPage } from "../components/AuthPage";
 import { ErrorPage } from "../app/ErrorPage";
 import { ProtectedRoute } from "../components/ProtectedRoute";
+import { Teams } from "../app/Teams";
 
 export const router = createBrowserRouter([
   {
@@ -22,5 +23,9 @@ export const router = createBrowserRouter([
   {
     path: "/auth",
     element: <AuthPage />,
-  }
+  },
+  {
+    path: "/teams",
+    element: <Teams />,
+  },
 ]);
