@@ -42,7 +42,7 @@ export const CreateTeamModal = ({ onClose, onCreate, team = null }) => {
           <div className="space-y-2">
             <label className="block text-sm font-medium text-neutral-900 dark:text-neutral-200">
               Team Name
-            </label>
+            </label>  
             <input
               type="text"
               value={teamData.name}
@@ -62,7 +62,7 @@ export const CreateTeamModal = ({ onClose, onCreate, team = null }) => {
             <textarea
               value={teamData.description}
               onChange={(e) =>
-                setTeamData({ ...teamData, description: e.target.value })
+                setTeamData({...teamData, description: e.target.value })
               }
               className="w-full rounded-lg border border-neutral-200 bg-white px-4 py-2.5 text-neutral-900 placeholder-neutral-400 transition-colors focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 dark:border-neutral-800 dark:bg-neutral-800 dark:text-white dark:placeholder-neutral-500 dark:focus:border-indigo-500"
               placeholder="Enter team description"
