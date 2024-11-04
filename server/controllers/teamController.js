@@ -201,3 +201,49 @@ exports.connectGithubRepo = async (req, res) => {
     res.status(500).send('Server Error');
   }
 };
+
+exports.updateTeam = async (req, res) => {
+  try {
+    const { teamId } = req.params;
+    const { name, description } = req.body;
+    
+    const team = await Team.findById(teamId);
+    if (!team) {
+      return res.status(404).json({ msg: 'Team not found' });
+    }
+
+    if (team.owner.toString() !== req.user.id) {
+      return res.status(403).json({ msg: 'Not authorized to update team' });
+    }
+
+    team.name = name;
+    team.description = description;
+    await team.save();
+
+    res.json(team);
+  } catch (err) {
+    console.error(err);
+    res.status(500).send('Server Error');
+  }
+};
+
+exports.deleteTeam = async (req, res) => {
+  try {
+    const { teamId } = req.params;
+    const team = await Team.findById(teamId);
+    
+    if (!team) {
+      return res.status(404).json({ msg: 'Team not found' });
+    }
+
+    if (team.owner.toString() !== req.user.id) {
+      return res.status(403).json({ msg: 'Not authorized to delete team' });
+    }
+
+    await team.remove();
+    res.json({ msg: 'Team deleted' });
+  } catch (err) {
+    console.error(err);
+    res.status(500).send('Server Error');
+  }
+};

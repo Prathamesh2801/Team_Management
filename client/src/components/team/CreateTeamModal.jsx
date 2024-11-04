@@ -1,15 +1,26 @@
 import { useState } from "react";
 import { X } from "lucide-react";
+import api from "../../utils/api";
+import { toast } from "react-hot-toast";
 
-export const CreateTeamModal = ({ onClose, onCreate }) => {
+export const CreateTeamModal = ({ onClose, onCreate, team = null }) => {
   const [teamData, setTeamData] = useState({
-    name: "",
-    description: "",
+    name: team?.name || "",
+    description: team?.description || "",
   });
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    onCreate(teamData);
+    if (team) {
+      try {
+        const response = await api.put(`/teams/${team._id}`, teamData);
+        onCreate(response.data, true);
+      } catch (error) {
+        toast.error('Failed to update team');
+      }
+    } else {
+      onCreate(teamData);
+    }
   };
 
   return (
@@ -17,7 +28,7 @@ export const CreateTeamModal = ({ onClose, onCreate }) => {
       <div className="w-full max-w-md rounded-xl bg-white p-6 shadow-lg dark:bg-neutral-900 dark:ring-1 dark:ring-white/10">
         <div className="mb-6 flex items-center justify-between">
           <h3 className="text-2xl font-semibold text-neutral-900 dark:text-white">
-            Create New Team
+            {team ? 'Edit Team' : 'Create New Team'}
           </h3>
           <button
             onClick={onClose}
@@ -71,7 +82,7 @@ export const CreateTeamModal = ({ onClose, onCreate }) => {
               type="submit"
               className="rounded-lg bg-indigo-600 px-4 py-2.5 text-sm font-medium text-white transition-colors hover:bg-indigo-700 focus:ring-2 focus:ring-indigo-500/20 disabled:cursor-not-allowed disabled:opacity-50"
             >
-              Create Team
+              {team ? 'Update Team' : 'Create Team'}
             </button>
           </div>
         </form>

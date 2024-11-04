@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   User2Icon,
   CheckCircle,
@@ -14,6 +14,7 @@ import {
 import { useAuth } from "../context/AuthContext";
 import { useNavigate } from "react-router-dom";
 import toast, { Toaster } from "react-hot-toast";
+import api from "../utils/api";
 
 const SidebarItem = ({ icon: Icon, text, onClick, children }) => {
   const [isOpen, setIsOpen] = useState(false);
@@ -49,6 +50,19 @@ export const Sidebar = () => {
   const [isMobileOpen, setIsMobileOpen] = useState(false);
   const { user, logout } = useAuth();
   const navigate = useNavigate();
+  const [teams, setTeams] = useState([]);
+
+  useEffect(() => {
+    const fetchTeams = async () => {
+      try {
+        const response = await api.get('/teams');
+        setTeams(response.data);
+      } catch (error) {
+        console.error('Error fetching teams:', error);
+      }
+    };
+    fetchTeams();
+  }, []);
 
   const handleLogout = () => {
     toast.success("Logged out successfully", {
@@ -87,14 +101,14 @@ export const Sidebar = () => {
 
         <div className="mt-2 space-y-1 px-3">
           <SidebarItem icon={LayoutDashboard} text="Dashboard" />
-          <SidebarItem icon={Users} text="Team Management">
-            <SidebarItem text="Engineering" />
-            <SidebarItem text="Design" />
-            <SidebarItem text="Marketing" />
-          </SidebarItem>
           <SidebarItem icon={Building2} text="Teams">
-            <SidebarItem text="Team One" />
-            <SidebarItem text="Team Two" />
+            {teams.map((team) => (
+              <SidebarItem 
+                key={team._id} 
+                text={team.name}
+                onClick={() => navigate(`/teams/${team._id}`)}
+              />
+            ))}
           </SidebarItem>
         </div>
 

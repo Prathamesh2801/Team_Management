@@ -12,6 +12,7 @@ export const TeamProjects = () => {
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [showInviteModal, setShowInviteModal] = useState(false);
   const [selectedTeamId, setSelectedTeamId] = useState(null);
+  const [editingTeam, setEditingTeam] = useState(null);
   const { user } = useAuth();
 
   useEffect(() => {
@@ -33,21 +34,47 @@ export const TeamProjects = () => {
     }
   };
 
-  const handleCreateTeam = async (teamData) => {
+  const handleCreateTeam = async (teamData, isEdit = false) => {
     try {
-      const response = await api.post("/teams", teamData);
-      setTeams([...teams, response.data]);
-      toast.success("Team created successfully!");
+      let response;
+      if (isEdit) {
+        response = await api.put(`/teams/${editingTeam._id}`, teamData);
+        setTeams(teams.map(team => team._id === editingTeam._id ? response.data : team));
+        toast.success("Team updated successfully!");
+      } else {
+        response = await api.post("/teams", teamData);
+        setTeams([...teams, response.data]);
+        toast.success("Team created successfully!");
+      }
       setShowCreateModal(false);
+      setEditingTeam(null);
     } catch (error) {
-      console.error("Error creating team:", error);
-      toast.error("Failed to create team");
+      console.error("Error creating/updating team:", error);
+      toast.error(isEdit ? "Failed to update team" : "Failed to create team");
     }
   };
 
   const handleInvite = (teamId) => {
     setSelectedTeamId(teamId);
     setShowInviteModal(true);
+  };
+
+  const handleEditTeam = (team) => {
+    setEditingTeam(team);
+    setShowCreateModal(true);
+  };
+
+  const handleDeleteTeam = async (teamId) => {
+    if (window.confirm('Are you sure you want to delete this team?')) {
+      try {
+        await api.delete(`/teams/${teamId}`);
+        setTeams(teams.filter(team => team._id !== teamId));
+        toast.success('Team deleted successfully!');
+      } catch (error) {
+        console.error('Error deleting team:', error);
+        toast.error('Failed to delete team');
+      }
+    }
   };
 
   if (loading) {
@@ -82,9 +109,25 @@ export const TeamProjects = () => {
               key={team._id}
               className="rounded-lg border border-gray-200 p-4 dark:border-gray-700"
             >
-              <h3 className="font-semibold text-gray-900 dark:text-white">
-                {team.name}
-              </h3>
+              <div className="flex justify-between items-center">
+                <h3 className="font-semibold text-gray-900 dark:text-white">
+                  {team.name}
+                </h3>
+                <div className="flex gap-2">
+                  <button
+                    onClick={() => handleEditTeam(team)}
+                    className="text-sm text-blue-600 hover:text-blue-700"
+                  >
+                    Edit
+                  </button>
+                  <button
+                    onClick={() => handleDeleteTeam(team._id)}
+                    className="text-sm text-red-600 hover:text-red-700"
+                  >
+                    Delete
+                  </button>
+                </div>
+              </div>
               {team.goal && (
                 <p className="mt-2 text-sm text-gray-600 dark:text-gray-300">
                   Goal: {team.goal.title}
@@ -103,8 +146,12 @@ export const TeamProjects = () => {
 
       {showCreateModal && (
         <CreateTeamModal 
-          onClose={() => setShowCreateModal(false)}
+          onClose={() => {
+            setShowCreateModal(false);
+            setEditingTeam(null);
+          }}
           onCreate={handleCreateTeam}
+          team={editingTeam}
         />
       )}
 

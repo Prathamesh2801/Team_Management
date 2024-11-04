@@ -7,7 +7,9 @@ const {
   setTeamGoal,
   inviteTeamMember,
   generateTeamInviteLink,
-  connectGithubRepo
+  connectGithubRepo,
+  updateTeam,
+  deleteTeam
 } = require('../controllers/teamController');
 const auth = require('../middleware/auth');
 const githubController = require('../controllers/githubController');
@@ -20,5 +22,7 @@ router.post('/:teamId/invite', auth, inviteTeamMember);
 router.post('/:teamId/invite-link', auth, generateTeamInviteLink);
 router.post('/:teamId/github', auth, connectGithubRepo);
 router.post('/:teamId/github/connect', auth, githubController.connectGithub);
+router.put('/:teamId', auth, updateTeam);
+router.delete('/:teamId', auth, deleteTeam);
 
 module.exports = router;
