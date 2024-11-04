@@ -12,7 +12,7 @@ import {
   Plus,
 } from "lucide-react";
 import { useAuth } from "../context/AuthContext";
-import { useNavigate } from "react-router-dom";
+import { NavLink, useNavigate } from "react-router-dom";
 import toast, { Toaster } from "react-hot-toast";
 import api from "../utils/api";
 
@@ -55,10 +55,10 @@ export const Sidebar = () => {
   useEffect(() => {
     const fetchTeams = async () => {
       try {
-        const response = await api.get('/teams');
+        const response = await api.get("/teams");
         setTeams(response.data);
       } catch (error) {
-        console.error('Error fetching teams:', error);
+        console.error("Error fetching teams:", error);
       }
     };
     fetchTeams();
@@ -100,11 +100,13 @@ export const Sidebar = () => {
         </div>
 
         <div className="mt-2 space-y-1 px-3">
-          <SidebarItem icon={LayoutDashboard} text="Dashboard" />
+          <NavLink to="/dashboard">
+            <SidebarItem icon={LayoutDashboard} text="Dashboard" />
+          </NavLink>
           <SidebarItem icon={Building2} text="Teams">
             {teams.map((team) => (
-              <SidebarItem 
-                key={team._id} 
+              <SidebarItem
+                key={team._id}
                 text={team.name}
                 onClick={() => navigate(`/teams/${team._id}`)}
               />
