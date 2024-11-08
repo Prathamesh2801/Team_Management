@@ -5,9 +5,7 @@ const TeamSchema = new mongoose.Schema({
     type: String,
     required: true
   },
-  description: {
-    type: String
-  },
+  description: String,
   owner: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User',
@@ -18,42 +16,28 @@ const TeamSchema = new mongoose.Schema({
       type: mongoose.Schema.Types.ObjectId,
       ref: 'User'
     },
-    email: String,
     role: {
       type: String,
-      enum: ['owner', 'admin', 'member'],
+      enum: ['owner', 'admin', 'member', 'viewer'],
       default: 'member'
-    },
-    status: {
-      type: String,
-      enum: ['pending', 'active'],
-      default: 'pending'
-    },
-    inviteToken: String,
-    inviteExpires: Date
+    }
   }],
   inviteLinks: [{
     code: {
       type: String,
-      sparse: true
+      required: true,
+      unique: true
     },
-    createdBy: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: 'User'
+    role: {
+      type: String,
+      enum: ['admin', 'member', 'viewer'],
+      default: 'member'
     },
-    expiresAt: Date
-  }],
-  goal: {
-    title: String,
-    description: String,
-    dueDate: Date
-  },
-  githubRepo: {
-    owner: String,
-    repo: String
-  }
-}, {
-  timestamps: true
+    expiresAt: {
+      type: Date,
+      required: true
+    }
+  }]
 });
 
 module.exports = mongoose.model('Team', TeamSchema);

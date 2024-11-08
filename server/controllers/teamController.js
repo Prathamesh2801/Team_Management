@@ -13,16 +13,31 @@ exports.createTeam = async (req, res) => {
       owner: req.user.id,
       members: [{
         user: req.user.id,
-        role: 'owner',
-        status: 'active'
+        role: 'owner'
       }]
     });
 
     const team = await newTeam.save();
-    res.json(team);
+    
+    // Generate an invite link for the team
+    const inviteCode = crypto.randomBytes(6).toString('hex');
+    team.inviteLinks = team.inviteLinks || [];
+    team.inviteLinks.push({
+      code: inviteCode,
+      createdBy: req.user.id,
+      expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000) // 7 days
+    });
+
+    await team.save();
+
+    // Send the invite link back in the response
+    res.status(201).json({
+      team,
+      inviteLink: `${process.env.CLIENT_URL}/join/${inviteCode}`
+    });
   } catch (err) {
     console.error('Error creating team:', err);
-    res.status(500).json({ msg: 'Server error while creating team' });
+    res.status(500).json({ msg: err.message || 'Server error while creating team' });
   }
 };
 
@@ -157,7 +172,12 @@ exports.generateTeamInviteLink = async (req, res) => {
       return res.status(404).json({ msg: 'Team not found' });
     }
 
-    const inviteCode = crypto.randomBytes(6).toString('hex');
+    // Generate a unique invite code
+    let inviteCode;
+    do {
+      inviteCode = crypto.randomBytes(6).toString('hex');
+    } while (team.inviteLinks.some(link => link.code === inviteCode)); // Ensure it's unique
+
     team.inviteLinks = team.inviteLinks || [];
     team.inviteLinks.push({
       code: inviteCode,
@@ -242,6 +262,66 @@ exports.deleteTeam = async (req, res) => {
 
     await team.remove();
     res.json({ msg: 'Team deleted' });
+  } catch (err) {
+    console.error(err);
+    res.status(500).send('Server Error');
+  }
+};
+
+exports.generateInviteLink = async (req, res) => {
+  try {
+    const { teamId } = req.params;
+    const { role = 'member' } = req.body;
+    
+    const team = await Team.findById(teamId);
+    if (!team) {
+      return res.status(404).json({ msg: 'Team not found' });
+    }
+
+    // Check if user has permission
+    const member = team.members.find(m => m.user.toString() === req.user.id);
+    if (!member || !['owner', 'admin'].includes(member.role)) {
+      return res.status(403).json({ msg: 'Not authorized to generate invite links' });
+    }
+
+    const inviteCode = crypto.randomBytes(6).toString('hex');
+    team.inviteLinks.push({
+      code: inviteCode,
+      role,
+      expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000) // 7 days
+    });
+
+    await team.save();
+    res.json({ inviteCode });
+  } catch (err) {
+    console.error(err);
+    res.status(500).send('Server Error');
+  }
+};
+
+exports.joinTeamWithInvite = async (req, res) => {
+  try {
+    const { inviteCode } = req.params;
+    
+    const team = await Team.findOne({ 'inviteLinks.code': inviteCode });
+    if (!team) {
+      return res.status(404).json({ msg: 'Invalid invite code' });
+    }
+
+    const invite = team.inviteLinks.find(link => link.code === inviteCode);
+    if (new Date() > invite.expiresAt) {
+      return res.status(400).json({ msg: 'Invite link has expired' });
+    }
+
+    if (!team.members.some(m => m.user.toString() === req.user.id)) {
+      team.members.push({
+        user: req.user.id,
+        role: invite.role
+      });
+      await team.save();
+    }
+
+    res.json(team);
   } catch (err) {
     console.error(err);
     res.status(500).send('Server Error');

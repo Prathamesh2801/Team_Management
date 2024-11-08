@@ -3,16 +3,17 @@ import { Plus } from "lucide-react";
 import api from "../../utils/api";
 import { toast } from "react-hot-toast";
 import { useAuth } from "../../context/AuthContext";
-import { CreateTeamModal } from "../team/CreateTeamModal";
-import { InviteModal } from "../team/InviteModal";
+import { TeamModal } from "../team/TeamModal";
+import { InviteLinkModal } from "../team/InviteLinkModal";
 
-export const TeamProjects = () => {
-  const [teams, setTeams] = useState([]);
+export const TeamProjects = ({ setTeams }) => {
+  const [teams, setLocalTeams] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [showInviteModal, setShowInviteModal] = useState(false);
   const [selectedTeamId, setSelectedTeamId] = useState(null);
   const [editingTeam, setEditingTeam] = useState(null);
+  const [inviteLink, setInviteLink] = useState("");
   const { user } = useAuth();
 
   useEffect(() => {
@@ -25,6 +26,7 @@ export const TeamProjects = () => {
     try {
       setLoading(true);
       const response = await api.get("/teams");
+      setLocalTeams(response.data);
       setTeams(response.data);
     } catch (error) {
       console.error("Error fetching teams:", error);
@@ -34,23 +36,15 @@ export const TeamProjects = () => {
     }
   };
 
-  const handleCreateTeam = async (teamData, isEdit = false) => {
+  const handleCreateTeam = async (teamData) => {
     try {
-      let response;
-      if (isEdit) {
-        response = await api.put(`/teams/${editingTeam._id}`, teamData);
-        setTeams(teams.map(team => team._id === editingTeam._id ? response.data : team));
-        toast.success("Team updated successfully!");
-      } else {
-        response = await api.post("/teams", teamData);
-        setTeams([...teams, response.data]);
-        toast.success("Team created successfully!");
-      }
-      setShowCreateModal(false);
-      setEditingTeam(null);
+      const response = await api.post("/teams", teamData);
+      setLocalTeams((prevTeams) => [...prevTeams, response.data]);
+      setTeams((prevTeams) => [...prevTeams, response.data]);
+      toast.success("Team created successfully!");
     } catch (error) {
-      console.error("Error creating/updating team:", error);
-      toast.error(isEdit ? "Failed to update team" : "Failed to create team");
+      console.error("Error creating team:", error);
+      toast.error("Failed to create team");
     }
   };
 
@@ -68,13 +62,18 @@ export const TeamProjects = () => {
     if (window.confirm('Are you sure you want to delete this team?')) {
       try {
         await api.delete(`/teams/${teamId}`);
-        setTeams(teams.filter(team => team._id !== teamId));
+        setLocalTeams(teams.filter(team => team._id !== teamId));
         toast.success('Team deleted successfully!');
       } catch (error) {
         console.error('Error deleting team:', error);
         toast.error('Failed to delete team');
       }
     }
+  };
+
+  // Optional: Display invite link in a modal or toast
+  const handleCloseInviteLink = () => {
+    setInviteLink(""); // Clear invite link when closing
   };
 
   if (loading) {
@@ -145,21 +144,24 @@ export const TeamProjects = () => {
       )}
 
       {showCreateModal && (
-        <CreateTeamModal 
-          onClose={() => {
-            setShowCreateModal(false);
-            setEditingTeam(null);
-          }}
+        <TeamModal 
+          onClose={() => setShowCreateModal(false)}
           onCreate={handleCreateTeam}
-          team={editingTeam}
         />
       )}
 
       {showInviteModal && (
-        <InviteModal 
+        <InviteLinkModal 
           teamId={selectedTeamId}
           onClose={() => setShowInviteModal(false)}
         />
+      )}
+
+      {inviteLink && (
+        <div className="toast">
+          <p>Invite Link: {inviteLink}</p>
+          <button onClick={handleCloseInviteLink}>Close</button>
+        </div>
       )}
     </div>
   );
